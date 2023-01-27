@@ -1,7 +1,7 @@
 
-# Bulk Merge EF Core
+# Bulk EF Core 7
 
-Comparando a nova funcionalidade do EFCore 7 (BulkMerge), como o metodo antigo de atualização/remoção de dados.
+Comparando a nova funcionalidade do EFCore 7 (Bulk), com o metodo antigo de atualização/remoção de dados.
 
 
 ## Dependencias
@@ -14,15 +14,13 @@ Comparando a nova funcionalidade do EFCore 7 (BulkMerge), como o metodo antigo d
 ## Rodando localmente
 
 Clone o projeto
-
 ```bash
-  git clone https://github.com/zavadzki72/POC-BulkMerge.git
+  git clone https://github.com/zavadzki72/POC-BulkEntityFrameworkCore.git
 ```
 
 Entre no diretório do projeto
-
 ```bash
-  cd POC-BulkMerge
+  cd POC-BulkEntityFrameworkCore
 ```
 
 Suba o docker-compose
@@ -33,36 +31,35 @@ Suba o docker-compose
 Atualize o banco com as migrations
 
 ```bash
-  Update-Database -StartupProject BulkMerge.RunMigrations -Project BulkMerge.App -Context ApplicationContext
+  Update-Database -StartupProject Bulk.RunMigrations -Project Bulk.App -Context ApplicationContext
 ```
 OU
 ```bash
-  cd .\BulkMerge.RunMigrations\
-  dotnet run -program BulkMerge.RunMigrations.csproj
+  cd .\Bulk.RunMigrations\
+  dotnet run -program Bulk.RunMigrations.csproj
 ```
 
-Agora, é necessário criar a massa de dados que iremos utilizar para nosso teste de performance, para isso existe o projeto `BulkMerge.PopuleDatabase`, no mesmo você encontra o `appsettings.json` e dentro dele existe a quantidade de dados a serem criados
+Agora, é necessário criar a massa de dados que iremos utilizar para nosso teste de performance, para isso existe o projeto `Bulk.PopuleDatabase`, no mesmo você encontra o `appsettings.json` e dentro dele existe a quantidade de dados a serem criados
 
-![image 1](https://user-images.githubusercontent.com/33812121/214970689-ab4bfc7f-ac58-42ba-8258-8659fe653199.png)
+![AppSettings](https://user-images.githubusercontent.com/33812121/214970689-ab4bfc7f-ac58-42ba-8258-8659fe653199.png)
 
 
 É importante ressaltar que os dados são inseridos de **10.000** em **10.000** até chegar na quantidade total. Caso queira mudar essa lógica, ela está no arquivo `Program.cs`
 
-![image 2](https://user-images.githubusercontent.com/33812121/214970739-28e06167-beb2-432c-903b-8284a600ba3a.png)
+![ProgramCs](https://user-images.githubusercontent.com/33812121/215113583-60d21d72-5014-4293-a6e0-79204540b83d.png)
 
-
-> É importante freezar que como eu estava em um ambiente aonde usava o SQLServer via docker, ficou *IMPOSSIVEL* realizar testes com massa de dados maior que *500.000* registros.
+> É importante freezar que como eu estava em um ambiente local aonde usava o SQLServer via docker, ficou *IMPOSSIVEL* realizar testes com massa de dados maior que *500.000* registros.
 
 Depois de ter a base com a massa de dados gerada, o proximo step é rodar o projeto e esperar a analise do Benchmark
 
 ```bash
-  cd .\BulkMerge.App\
-  dotnet run -program BulkMerge.App.csproj -c Release
+  cd .\Bulk.App\
+  dotnet run -program Bulk.App.csproj -c Release
 ```
 
 
 ## Resultados
-Como resultado da analise, rodando localmente com um banco de dados dockerizados, eu tive a seguinte resposta
+Como resultado da analise, rodando localmente com um banco de dados dockerizados, eu tive a seguinte analise
 
 ``` ini
 
@@ -84,10 +81,10 @@ Intel Core i7-8750H CPU 2.20GHz (Coffee Lake), 1 CPU, 12 logical and 6 physical 
 
 Caso queira, são gerados arquivos de resultado mais detalhados dentro da pasta `BenchmarkDotNet.Artifacts\results`:
 
-![image 3](https://user-images.githubusercontent.com/33812121/214970614-161bcca1-4e68-4985-a8c3-a90d8865e81d.png)
+![BenchmarkResults](https://user-images.githubusercontent.com/33812121/215113939-fda9c952-d8f6-4728-ad67-717a923b58d1.png)
 
+Com esses resultados chega-se a conclusão que apesar de ainda ser algo novo e limitado (Senti falta de um BulkMerge(Upsert)), utilizar o BULK do EFCore é **MUITO** mais performatico do que utilizar um Update/Delete convencional. Esperamos que conforme o tempo passe, o mesmo seja incorporado =).
 
-Com esses resultados chega-se a conclusão que apesar de ainda ser algo novo e limitado (por enquanto), utilizar o BULK Merge do EFCore é **MUITO** mais performatico do que utilizar um Update/Delete convencional.
 ## Referências
 
  - [Benchmark](https://benchmarkdotnet.org)
