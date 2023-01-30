@@ -25,6 +25,26 @@ namespace Bulk.PopuleDatabase
 
             var teamService = serviceProvider.GetRequiredService<ITeamService>();
 
+            var isDev = Convert.ToBoolean(configuration["IsDev"] ?? "false");
+
+            if (isDev)
+            {
+                try
+                {
+                    teamService.PopuleDatabaseDev().Wait();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"ERRO AO POPULAR BASE -> {ex.Message}");
+                }
+                finally
+                {
+                    Console.WriteLine("\nFINALIZANDO POPULAR BASE (DEV)");
+                }
+
+                return;
+            }
+
             var quantityItemsToInsertStr = configuration["QuantityItemsToInsert"];
 
             var quantityItemsToInsert = string.IsNullOrWhiteSpace(quantityItemsToInsertStr) ? 500000 : long.Parse(quantityItemsToInsertStr);
@@ -59,7 +79,8 @@ namespace Bulk.PopuleDatabase
 
         static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            string? connectionString = configuration["SqlServer"];
+            var isDev = Convert.ToBoolean(configuration["IsDev"] ?? "false");
+            string? connectionString = (isDev) ? configuration["SqlServerDev"] : configuration["SqlServer"];
 
             services.AddDbContext<ApplicationContext>(options => {
                 options.UseSqlServer(connectionString);

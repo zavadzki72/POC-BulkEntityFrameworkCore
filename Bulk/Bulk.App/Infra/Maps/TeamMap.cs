@@ -33,6 +33,9 @@ namespace Bulk.App.Infra.Maps
             builder.HasOne(x => x.Stadium)
                 .WithOne(x => x.Team)
                 .HasForeignKey<TeamEntity>(x => x.StadiumId);
+
+            builder.HasIndex(x => x.Name)
+                .IsUnique();
         }
     }
 }

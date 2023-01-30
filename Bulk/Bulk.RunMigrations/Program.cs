@@ -27,7 +27,10 @@ namespace Bulk.RunMigrations
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
             IConfigurationRoot configuration = configurationBuilder.Build();
-            string? connectionString = configuration["SqlServer"];
+
+            var isDev = Convert.ToBoolean(configuration["IsDev"] ?? "false");
+
+            string? connectionString = (isDev) ? configuration["SqlServerDev"] : configuration["SqlServer"];
 
             DbContextOptionsBuilder<ApplicationContext> optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>()
                 .UseSqlServer(connectionString);

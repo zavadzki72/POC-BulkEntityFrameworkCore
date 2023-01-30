@@ -25,6 +25,8 @@ namespace Bulk.App.Infra.Maps
             builder.Property(x => x.Nickname)
                 .IsRequired();
 
+            builder.HasIndex(x => x.Name)
+                .IsUnique();
         }
     }
 }
